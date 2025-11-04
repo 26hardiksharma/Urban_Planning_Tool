@@ -53,9 +53,8 @@ pre {
     overflow-x: auto;
 }
 
-/* ==================== Result Box Styling ==================== */
 .result-box {
-    background-color: #e8f5e9; /* light green */
+    background-color: #e8f5e9;
     border-left: 5px solid #4caf50;
     padding: 15px;
     margin-top: 10px;
@@ -78,18 +77,16 @@ pre {
     color: #007bff;
 }
 
-/* Highlight animation when a result appears */
 .algo-section.active .result-box {
     animation: highlight 1.5s ease;
 }
 
 @keyframes highlight {
-    0%   { background-color: #ffff99; } /* flash yellow */
-    50%  { background-color: #e8f5e9; } /* return to green */
+    0%   { background-color: #ffff99; }
+    50%  { background-color: #e8f5e9; }
     100% { background-color: #e8f5e9; }
 }
 
-/* Optional: node list small font and wrapping */
 .node-list {
     margin-top: 5px;
     font-size: 0.9em;
