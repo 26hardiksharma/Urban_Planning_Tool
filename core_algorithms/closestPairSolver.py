@@ -41,13 +41,27 @@ def loadProximityData():
         with open('data/coordinates.json') as f:
             data = json.load(f)
     except FileNotFoundError:
-        return []
+        return [], []
 
+    # 1. Feature 8: Emergency Response (Uses all 50 points)
     emergency_points = []
     for i, p in enumerate(data):
+        # Data structure is a list of dictionaries, accessing by keys 'name', 'x', 'y'
         emergency_points.append({
             'name': f"{p['name']}", 
             'coords': (p['x'], p['y']) 
         })
+    
+    # 2. Feature 9: Underserved Zones (Uses a subset of 4 points)
+    underserved_indices = [8, 11, 25, 49] 
+    
+    underserved_points = []
+    for i in underserved_indices:
+        if i < len(data):
+            p = data[i]
+            underserved_points.append({
+                'name': f"{p['name']} (Underserved)", 
+                'coords': (p['x'], p['y'])
+            })
 
-    return emergency_points
+    return emergency_points, underserved_points

@@ -42,7 +42,7 @@ def loadNetworkEdgesForDisplay():
 
 
 def getRenderContext(activeResultKey=None, activeResultValue=None):
-    emergency_points = loadProximityData()
+    emergency_points, underserved_points = loadProximityData()
     
     networkData = loadNetworkData()
     networkNodes = [{'id': n[0], 'name': n[1]['name']} for n in networkData.nodes(data=True)]
@@ -52,7 +52,8 @@ def getRenderContext(activeResultKey=None, activeResultValue=None):
     context = {
         'networkNodes': networkNodes,
         'all_network_edges': all_network_edges,
-        'emergency_points': emergency_points, 
+        'emergency_points': emergency_points,
+        'underserved_points': underserved_points,
         'dijkstraResult': None,
         'knapsackResult': None,
         'mstResult': None,
@@ -118,7 +119,7 @@ def handleSensorPlacement():
 
 @app.route('/check-proximity', methods=['POST'])
 def handleProximityChecker():
-    emergency_points = loadProximityData()
+    emergency_points, underserved_points = loadProximityData()
     result = findClosestPair(emergency_points)
     return render_template('index.html', **getRenderContext('proximityResult', result))
 

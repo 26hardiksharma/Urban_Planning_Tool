@@ -3,30 +3,46 @@ import numpy as np
 def solveKnapsack(projects, maxBudget):
     n = len(projects)
     
-    weights = [p['cost'] for p in projects]
-    values = [p['benefit'] for p in projects]
-    names = [p['name'] for p in projects]
-
-    K = np.zeros((n + 1, maxBudget + 1))
-
+    if maxBudget <= 0 or n == 0:
+        return {
+            'selectedProjects': [],
+            'totalBenefit': 0,
+            'totalCost': 0,
+            'remainingBudget': maxBudget
+        }
+    
+    dp = np.zeros((n + 1, maxBudget + 1), dtype=int)
+    
     for i in range(1, n + 1):
-        for w in range(1, maxBudget + 1):
-            if weights[i-1] <= w:
-                K[i, w] = max(values[i-1] + K[i-1, w - weights[i-1]], K[i-1, w])
+        project = projects[i - 1]
+        cost = project['cost']
+        benefit = project['benefit']
+        
+        for w in range(maxBudget + 1):
+            if cost <= w:
+                dp[i][w] = max(dp[i-1][w], dp[i-1][w - cost] + benefit)
             else:
-                K[i, w] = K[i-1, w]
-
+                dp[i][w] = dp[i-1][w]
+    
     selectedProjects = []
     w = maxBudget
+    totalCost = 0
+    
     for i in range(n, 0, -1):
-        if K[i, w] != K[i-1, w]:
-            selectedProjects.append(names[i-1])
-            w -= weights[i-1]
-            
-    totalCost = sum(weights[i] for i, name in enumerate(names) if name in selectedProjects)
-
+        if dp[i][w] != dp[i-1][w]:
+            project = projects[i - 1]
+            selectedProjects.append(project['name'])
+            totalCost += project['cost']
+            w -= project['cost']
+    
+    selectedProjects.reverse()
+    
+    totalBenefit = dp[n][maxBudget]
+    remainingBudget = maxBudget - totalCost
+    
     return {
-        'maxBenefit': K[n, maxBudget],
+        'selectedProjects': selectedProjects,
+        'totalBenefit': totalBenefit,
         'totalCost': totalCost,
-        'selectedProjects': selectedProjects
+        'remainingBudget': remainingBudget
     }
