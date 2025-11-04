@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 import json
-import networkx as nx
 
 from core_algorithms.shortestPath import solveDijkstra
 from core_algorithms.knapsackSolver import solveKnapsack
@@ -14,16 +13,7 @@ app = Flask(__name__)
 def loadNetworkData():
     with open('data/city_network.json') as f:
         data = json.load(f)
-    
-    G = nx.Graph()
-
-
-    for node in data['nodes']:
-        G.add_node(node['id'], name=node['name'])
-    
-    for u, v, weight in data['edges']:
-        G.add_edge(u, v, weight=weight)
-    return G
+    return data
 
 def loadProjectsData():
     with open('data/projects.json') as f:
@@ -45,7 +35,7 @@ def getRenderContext(activeResultKey=None, activeResultValue=None):
     emergency_points, underserved_points = loadProximityData()
     
     networkData = loadNetworkData()
-    networkNodes = [{'id': n[0], 'name': n[1]['name']} for n in networkData.nodes(data=True)]
+    networkNodes = [{'id': node['id'], 'name': node['name']} for node in networkData['nodes']]
     
     all_network_edges = loadNetworkEdgesForDisplay()
     
@@ -77,8 +67,8 @@ def home():
 def handleDijkstra():
     startNode = request.form['startNode'].upper()
     endNode = request.form['endNode'].upper()
-    G = loadNetworkData()
-    result = solveDijkstra(G, startNode, endNode)
+    graph = loadNetworkData()
+    result = solveDijkstra(graph, startNode, endNode)
     return render_template('index.html', **getRenderContext('dijkstraResult', result))
 
 @app.route('/solve-knapsack', methods=['POST'])
@@ -93,8 +83,8 @@ def handleKnapsack():
 
 @app.route('/solve-mst', methods=['POST'])
 def handleMST():
-    G = loadNetworkData()
-    result = buildMST(G)
+    graph = loadNetworkData()
+    result = buildMST(graph)
     return render_template('index.html', **getRenderContext('mstResult', result))
 
 @app.route('/solve-hull', methods=['POST'])
