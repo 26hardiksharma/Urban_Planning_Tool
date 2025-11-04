@@ -1,25 +1,25 @@
 from scipy.spatial import ConvexHull
-import numpy as np
+import json
 
-def buildConvexHull(pointsList):
-    coords = [(p['x'], p['y']) for p in pointsList]
-    points = np.array(coords)
-    
+def buildConvexHull(points):
     if len(points) < 3:
-        return {'hullPointsStr': "Requires at least 3 points.", 'area': 0, 'error': "Requires at least 3 points."}
-        
+        return {'error': 'Need at least 3 points to build a hull.', 'area': 0, 'hullPointsStr': ''}
+    
+    coords = [(p['x'], p['y']) for p in points]
+    
     try:
-        hull = ConvexHull(points)
+        hull = ConvexHull(coords)
         
-        hullPointsIndices = hull.vertices
-        hullPointsInfo = [pointsList[i] for i in hullPointsIndices]
+        hull_points = [points[i] for i in hull.vertices]
         
-        hullPointsStr = [f"{p['name']} ({p['x']}, {p['y']})" for p in hullPointsInfo]
+        hull_points_str = "\n".join([f"{p['name']}: ({p['x']}, {p['y']})" for p in hull_points])
+        
+        area = hull.volume
         
         return {
-            'hullPointsStr': "\n".join(hullPointsStr),
-            'area': round(hull.area, 2),
-            'error': None
+            'area': round(area, 2),
+            'hullPointsStr': hull_points_str,
+            'numVertices': len(hull.vertices)
         }
     except Exception as e:
-        return {'hullPointsStr': "Calculation failed.", 'area': 0, 'error': f"Hull calculation failed: {e}"}
+        return {'error': str(e), 'area': 0, 'hullPointsStr': ''}

@@ -59,7 +59,7 @@
         <p>This tool applies specialized algorithms to solve resource allocation and logistics problems within the Nagpur metropolitan area.</p>
         
         <div class="city-map-container">
-            <h2>Nagpur Network Map & Connections (60 Edges)</h2>
+            <h2>Nagpur Network Map & Connections</h2>
             <p><strong>Available Node IDs (N1-N50) and corresponding areas:</strong></p>
             <p class="node-list">
                 {% for node in networkNodes %}
@@ -75,7 +75,7 @@
 {{ edge }}
 {% endfor %}
             </pre>
-            <p class="city-map-legend">This list defines the full graph structure used by Features 1, 3, and 5.</p>
+            <p class="city-map-legend">This list defines the full graph structure used by Features 1 and 3.</p>
         </div>
         <div class="algo-section" id="feature-1">
             <h2>1. 🚨 Emergency Response Route Planner</h2>
@@ -85,7 +85,7 @@
                     <strong>{{ node.id }}</strong> ({{ node.name }}){% if not loop.last %}, {% endif %}
                 {% endfor %}
             </p>
-            <form method="POST" action="/solve-dijkstra">
+            <form method="POST" action="/solve-dijkstra#feature-1">
                 <input type="text" name="startNode" placeholder="Start Node ID (e.g., N1)" required>
                 <input type="text" name="endNode" placeholder="End Node ID (e.g., N7)" required>
                 <button type="submit">Calculate Fastest Route</button>
@@ -104,7 +104,7 @@
             <p><strong>Functionality:</strong> Uses the Knapsack algorithm to select the optimal mix of projects that maximizes total public benefit while strictly staying within the allocated budget.</p>
             <p><strong>Available Projects:</strong> Approx. 30 tasks available (e.g., Health Clinics, Road Repair, IT Upgrades, etc.).</p>
             <p><strong>Cost Unit:</strong> Costs are measured in **Lakhs (L)**. Enter your budget in Lakhs.</p>
-            <form method="POST" action="/solve-knapsack">
+            <form method="POST" action="/solve-knapsack#feature-2">
                 <input type="number" name="maxBudget" placeholder="Max Budget (e.g., 500 Lakhs)" required>
                 <button type="submit">Allocate Budget</button>
             </form>
@@ -121,7 +121,7 @@
         <div class="algo-section" id="feature-3">
             <h2>3. 💧 Minimize Cost: Utility Network Design</h2>
             <p><strong>Functionality:</strong> Applies the Minimum Spanning Tree (MST) algorithm to find the single least expensive network that connects all utility service points.</p>
-            <form method="POST" action="/solve-mst">
+            <form method="POST" action="/solve-mst#feature-3">
                 <button type="submit">Calculate Minimum Network Cost</button>
             </form>
             {% if mstResult %}
@@ -138,7 +138,7 @@
             <h2>4. 🗺️ Define Land Boundary (Zoning Tool)</h2>
             <p><strong>Functionality:</strong> Uses the Convex Hull algorithm on survey coordinates to define the smallest, most efficient legal boundary enclosing a target area (from 50 Nagpur localities).</p>
             <p>Analyzes 50 Pre-loaded coordinates. <span style="color: #999;">({{ hullResult.error if hullResult.error else 'Ready.' }})</span></p>
-            <form method="POST" action="/solve-hull">
+            <form method="POST" action="/solve-hull#feature-4">
                 <button type="submit">Calculate Optimal Boundary</button>
             </form>
             {% if hullResult and not hullResult.error %}
@@ -151,26 +151,11 @@
             {% endif %}
         </div>
 
-        <div class="algo-section" id="feature-5">
-            <h2>5. 🗓️ Project Critical Path Analyzer (Multistage)</h2>
-            <p><strong>Functionality:</strong> Finds the path of tasks that results in the minimum total cost or time using a Multistage Graph model.</p>
-            <p>Project Flow (Nodes N1 to N50): Find min cost path from N1 to N50.</p>
-            <form method="POST" action="/solve-multistage">
-                <button type="submit">Calculate Minimum Cost Path</button>
-            </form>
-            {% if multistageResult %}
-                <div class="result-box">
-                    <p class="result-title">✅ Minimum Cost Sequence Found:</p>
-                    <p>Optimal Task Sequence: <span class="visual-path">{{ multistageResult.optimalPath }}</span></p>
-                    <p>Minimum Total Cost: <strong>{{ multistageResult.totalCost }} units</strong></p>
-                </div>
-            {% endif %}
-        </div>
         
-        <div class="algo-section" id="feature-6">
-            <h2>6. 📶 Non-Interfering Sensor Placement</h2>
+        <div class="algo-section" id="feature-5">
+            <h2>5. 📶 Non-Interfering Sensor Placement</h2>
             <p><strong>Functionality:</strong> Uses the N-Queen backtracking method to find non-overlapping positions for sensors (or Wi-Fi hotspots) on a grid zone, maximizing coverage without interference.</p>
-            <form method="POST" action="/solve-sensors">
+            <form method="POST" action="/solve-sensors#feature-5">
                 <input type="number" name="numSensors" placeholder="Number of Sensors (N)" required>
                 <button type="submit">Find Placement</button>
             </form>
@@ -194,36 +179,15 @@
             {% endif %}
         </div>
     
-<div class="algo-section" id="feature-7">
-            <h2>7. 🚫 Proximity Conflict Scheduler</h2>
-            <p><strong>Functionality:</strong> Finds the maximum number of simultaneous maintenance tasks that can be scheduled across Nagpur without violating the **25-unit minimum geographic separation** threshold.</p>
-            <p>Conflict Rule: Tasks must be separated by at least **{{ "25.0 units" }}**.</p>
-            <form method="POST" action="/solve-schedule">
-                <button type="submit">Generate Max Non-Conflicting Schedule</button>
-            </form>
-            {% if scheduleResult %}
-                <div class="result-box">
-                    <p class="result-title">✅ Max Non-Conflicting Set Generated:</p>
-                    
-                    <p>Total Non-Conflicting Tasks: <strong>{{ scheduleResult['totalSelected'] }}</strong></p>
-                    <p>Conflict Threshold Used: <strong>{{ scheduleResult['conflictThreshold'] }} units</strong></p>
-                    <p>Selected Locations:</p>
-                    <pre>{{ scheduleResult.selectedAreas|join("\n") }}</pre>
-                </div>
-            {% endif %}
-        </div>
-
-                
-
-        <div class="algo-section" id="feature-8">
-            <h2>8. 🚨 Emergency Response Proximity Checker</h2>
+        <div class="algo-section" id="feature-6">
+            <h2>6. 🚨 Emergency Response Proximity Checker</h2>
             <p><strong>Functionality:</strong> Uses the Closest Pair algorithm on all 50 Nagpur locality coordinates to identify the two incident sites closest to each other, optimizing dual dispatch.</p>
             <p>Analyzed Incidents (50+ Nagpur Localities): 
                 {% for point in emergency_points[:5] %}
                     {{ point.name }}{% if not loop.last %}, {% endif %}
                 {% endfor %}... (Total {{ emergency_points|length }} locations)
             </p>
-            <form method="POST" action="/check-proximity">
+            <form method="POST" action="/check-proximity#feature-6">
                 <button type="submit">Find Closest Incidents</button>
             </form>
             {% if proximityResult %}
@@ -232,49 +196,6 @@
                     <p>Pair: <strong>{{ proximityResult.pair_1_name }}</strong> and <strong>{{ proximityResult.pair_2_name }}</strong></p>
                     <p>Distance: <strong>{{ proximityResult.distance }} units</strong></p>
                     <p>Coordinates: {{ proximityResult.pair_1_coords }} and {{ proximityResult.pair_2_coords }}</p>
-                </div>
-            {% endif %}
-        </div>
-        
-        <div class="algo-section" id="feature-9">
-            <h2>9. 🏘️ Underserved Zone Identifier (Equity Analysis)</h2>
-            <p><strong>Functionality:</strong> Uses the Closest Pair algorithm on a subset of Nagpur zones lacking a resource to determine the ideal central location for a new facility.</p>
-            <p>Analyzed Underserved Zones:
-                {% for point in underserved_points %}
-                    {{ point.name }}{% if not loop.last %}, {% endif %}
-                {% endfor %}
-            </p>
-            <form method="POST" action="/check-equity">
-                <button type="submit">Find Closest Underserved Zones</button>
-            </form>
-            {% if equityResult %}
-                <div class="result-box">
-                    <p class="result-title">✅ Closest Underserved Zone Pair Found (Equity Check):</p>
-                    <p>Pair: <strong>{{ equityResult.pair_1_name }}</strong> and <strong>{{ equityResult.pair_2_name }}</strong></p>
-                    <p>Distance: <strong>{{ equityResult.distance }} units</strong></p>
-                    <p>Suggestion: Build facility near the midpoint between the two zones.</p>
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="algo-section" id="feature-10">
-            <h2>10. 👷 Multi-Crew Maintenance Window Scheduler</h2>
-            <p><strong>Functionality:</strong> Maximize the total time a critical, shared resource (e.g., a central road lane or specialized equipment) is utilized productively by scheduling the maximum number of non-overlapping jobs.</p>
-            <p>Input Flows (Locality, Start, Finish): <span class="visual-path">
-                {% for flow in trafficFlows %}
-                    {{ flow.name }} ({{ flow.start }}s-{{ flow.finish }}s){% if not loop.last %}, {% endif %}
-                {% endfor %}
-            </span></p>
-            <form method="POST" action="/solve-maintenance-schedule">
-                <button type="submit">Generate Optimal Maintenance Schedule</button>
-            </form>
-            {% if maintenanceScheduleResult %}
-                <div class="result-box">
-                    <p class="result-title">✅ Optimal Resource Schedule Generated:</p>
-                    <p>Maximum Total Productive Time: <strong>{{ maintenanceScheduleResult.totalGreenTime }} seconds</strong></p>
-                    <p>Selected Task Sequence: <span class="visual-path">{{ maintenanceScheduleResult.selectedFlows|join(" -> ") }}</span></p>
-                    <p style="margin-top: 10px;">Full Schedule Details:</p>
-                    <pre>{{ maintenanceScheduleResult.scheduleDetails|join("\n") }}</pre>
                 </div>
             {% endif %}
         </div>
